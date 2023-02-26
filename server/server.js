@@ -67,7 +67,7 @@ app.post("/register", async (req, res) => {
         }
 
         const p = await users.insertOne(userDocument)
-        const token = jwt.sign({ id: p.insertedId, username }, process.env.JWT_SECRET, {
+        const token = jwt.sign({ id: p.insertedId.toString(), username }, process.env.JWT_SECRET, {
             expiresIn: "24h"
         })
         res.cookie("jwt", token, { maxAge: 86400000, httpOnly: true })
@@ -98,7 +98,7 @@ app.post("/login", async (req, res) => {
         if (user) {
             const isValidPass = await bcrypt.compare(password, user.password)
             if (isValidPass) {
-                const token = jwt.sign({ id: user._id, username }, process.env.JWT_SECRET, {
+                const token = jwt.sign({ id: user._id.toString(), username }, process.env.JWT_SECRET, {
                     expiresIn: "24h"
                 })
                 res.cookie("jwt", token, { maxAge: 86400000, httpOnly: true })
