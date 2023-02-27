@@ -29,12 +29,12 @@ const verifyJwt = async (req, res, next) => {
     const token = req.cookies.jwt
 
     if (!token) {
-        return res.status(401).send({ message: "No token" })
+        return res.status(401).send("No token" )
     }
 
     jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
         if (err) {
-            return res.status(401).send({ message: "Not authorized" })
+            return res.status(401).send("Not authorized" )
         }
         req.user = decoded
     })
@@ -104,14 +104,14 @@ app.post("/login", async (req, res) => {
                 res.cookie("jwt", token, { maxAge: 86400000, httpOnly: true })
                 res.status(200).send("Authenticated")
             } else {
-                res.status(500).send("Incorrect password")
+                res.status(401).send("Incorrect password")
             }
         } else {
             res.status(500).send("User does not exist")
         }
     } catch (error) {
         console.error(error)
-        res.status(500).send("Failed to authenticate user")
+        res.status(401).send("Failed to authenticate user")
     } finally {
         await client.close()
     }
@@ -155,6 +155,29 @@ app.get("/api/users/:username", async (req, res) => {
     } finally {
         await client.close()
     }
+})
+
+//Logout user
+app.get("/logout", (req, res) => {
+    res.cookie("jwt", {}, { maxAge: 0, httpOnly: true })
+    res.status(200).send("Successfully logged out")
+})
+
+//Validate user
+app.get("/validate", (req, res) => {
+    const token = req.cookies.jwt
+
+    if(!token) {
+        res.status(401).send("No token")
+    }
+
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+        if(err) {
+            res.status(401).send("Not authorized")
+        } else {
+            res.status(200).send(decoded)
+        }
+    })
 })
 
 io.on("connection", (socket) => {

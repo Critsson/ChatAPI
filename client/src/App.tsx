@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react'
 import './App.css'
 import { io } from 'socket.io-client'
 import Message from "../components/Message"
+import Login from "../components/Login"
 
 function App() {
 
   const [input, setInput] = useState<string>("")
   const [messages, setMessages] = useState<JSX.Element[]>([])
   const [socket, setSocket] = useState<any>(null)
+  const [loggedIn, setLoggedIn] = useState<boolean>(false)
 
   useEffect(() => {
     if(socket) {
@@ -43,7 +45,8 @@ function App() {
 
   return (
     <div className="main-container">
-      <div className="chat-window">
+      <Login />
+      {/* <div className="chat-window">
         {
           messages
         }
@@ -51,7 +54,7 @@ function App() {
       <form className="input-form" onSubmit={(e) => submitMessage(e)}>
         <input type="text" className="text-input" value={input} onChange={(e) => setInput(e.target.value)} />
         <input type="submit" className="submit-button" />
-      </form>
+      </form> */}
     </div>
   )
 }
