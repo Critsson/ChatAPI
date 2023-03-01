@@ -180,6 +180,28 @@ app.get("/validate", (req, res) => {
     })
 })
 
+//Delete user
+app.delete("/delete", verifyJwt, async (req, res) => {
+    const {id} = req.user
+
+    try {
+        await client.connect()
+        const database = client.db("ChatApp")
+        const users = database.collection("Users")
+
+        const p = await users.deleteOne({_id: ObjectId(id)})
+
+        res.cookie("jwt", {}, { maxAge: 0, httpOnly: true })
+
+        res.status(200).send("User successfully delete")
+    } catch (error) {
+        console.error(error)
+        res.status(500).send("Error")
+    } finally {
+        await client.close()
+    }
+})
+
 io.on("connection", (socket) => {
     socket.on("send-message", (input, id) => {
         console.log(input)
